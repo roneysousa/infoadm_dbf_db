@@ -1,0 +1,133 @@
+unit uLocProduto;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Grids, DBGrids, Buttons, StdCtrls, ExtCtrls, DB;
+
+type
+  TfrmLocProduto = class(TForm)
+    edtPROCURA: TLabeledEdit;
+    BtnConfirmar: TSpeedButton;
+    BtnCancelar: TSpeedButton;
+    GridDados: TDBGrid;
+    dsProdutos: TDataSource;
+    rdCODIGO: TRadioButton;
+    rbNOME: TRadioButton;
+    procedure edtPROCURAKeyPress(Sender: TObject; var Key: Char);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
+    procedure edtPROCURAChange(Sender: TObject);
+    procedure BtnConfirmarClick(Sender: TObject);
+    procedure BtnCancelarClick(Sender: TObject);
+    procedure edtPROCURAEnter(Sender: TObject);
+    procedure rdCODIGOClick(Sender: TObject);
+    procedure rbNOMEClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmLocProduto: TfrmLocProduto;
+
+implementation
+
+Uses udmInfoADM,uFuncoes;
+
+{$R *.dfm}
+
+procedure TfrmLocProduto.edtPROCURAKeyPress(Sender: TObject; var Key: Char);
+begin
+    if key = #13 then btnconfirmar.Click;
+    if key = #13 then btncancelar.Click;
+end;
+
+procedure TfrmLocProduto.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+      Action := caFree;
+end;
+
+procedure TfrmLocProduto.FormShow(Sender: TObject);
+begin
+   With dmInfoADM.qryProdutos do
+   begin
+         sql.clear;
+         sql.add('select * from ADMPRO order by PRO_NMPROD');
+         execsql;
+         open;
+   End;
+end;
+
+procedure TfrmLocProduto.edtPROCURAChange(Sender: TObject);
+begin
+     If not uFuncoes.Empty(edtPROCURA.Text) Then
+     begin
+               // Procura pelo nome
+               With dmInfoADM.qryProdutos do
+               begin
+                    SQL.Clear;
+                    Sql.add('select * from ADMPRO where PRO_NMPROD like ' + quotedstr(edtPROCURA.Text+'%') + ' order by PRO_NMPROD');
+                    ExecSQL;
+                    Open;
+               End;
+{          If (uFuncoes.StrIsInteger(edtPROCURA.Text)) Then
+          begin
+               // Procura pelo codigo
+               With dmInfoADM.qryProdutos do
+               begin
+                    SQL.Clear;
+                    Sql.add('select * from ADMPRO where PRO_CDPROD like ' + quotedstr(edtPROCURA.Text+'%') + ' order by PRO_NMPROD');
+                    ExecSQL;
+                    Open;
+               End;
+          End
+          Else
+          begin
+               // Procura pelo nome
+               With dmInfoADM.qryProdutos do
+               begin
+                    SQL.Clear;
+                    Sql.add('select * from ADMPRO where PRO_NMPROD like ' + quotedstr(edtPROCURA.Text+'%') + ' order by PRO_NMPROD');
+                    ExecSQL;
+                    Open;
+               End;
+          End;}
+     End;
+end;
+
+procedure TfrmLocProduto.BtnConfirmarClick(Sender: TObject);
+Var
+    M_CDPROD : String;
+begin
+     M_CDPROD := dmInfoADM.qryProdutos.fieldByName('PRO_CDPROD').AsString;
+     //
+     dmInfoADM.tbProdutos.Locate('PRO_CDPROD',M_CDPROD,[]);
+     // Fechar janela de localizar
+     close;
+end;
+
+procedure TfrmLocProduto.BtnCancelarClick(Sender: TObject);
+begin
+     Close;
+end;
+
+procedure TfrmLocProduto.edtPROCURAEnter(Sender: TObject);
+begin
+     edtPROCURA.Clear; 
+end;
+
+procedure TfrmLocProduto.rdCODIGOClick(Sender: TObject);
+begin
+      edtPROCURA.SetFocus; 
+end;
+
+procedure TfrmLocProduto.rbNOMEClick(Sender: TObject);
+begin
+     edtPROCURA.SetFocus;
+end;
+
+end.
